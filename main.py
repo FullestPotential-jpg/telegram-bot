@@ -1,0 +1,58 @@
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+
+# ЗАМЕНИ НА СВОЙ ТОКЕН от BotFather!
+BOT_TOKEN = "8420860789:AAETOuPb4hbTe5aK-AXdJi-7uwo1rKLBEAw"
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    payment_info = """
+• Платформа по реализации вашего потенциала (3 Модуля — 10 Подмодулей)
+💳 *Информация об оплате*
+
+💰 Сумма: 724 рубля
+📞 После оплаты пришлите скриншот чека сюда: @Dimasurkov1
+
+Нажмите кнопку "Оплатить" чтобы получить реквизиты
+    """
+    
+    keyboard = [[InlineKeyboardButton("💳 Оплатить", callback_data="get_payment_details")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(
+        payment_info,
+        reply_markup=reply_markup,
+        parse_mode='Markdown'
+    )
+
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    if query.data == "get_payment_details":
+        payment_details = """
+✅ *Реквизиты для оплаты*
+
+📱 **Номер Юмани:** `4100118801542691`
+💰 **Сумма:** 724 рубля
+
+📋 *Инструкция:*
+1. Скопируйте номер кошелька
+2. Перейдите в Юмани
+3. Вставьте номер и сумму
+4. Оплатите
+5. Пришлите скриншот чека сюда: @Dimasurkov1
+        """
+        
+        await query.message.reply_text(
+            payment_details,
+            parse_mode='Markdown'
+        )
+
+def main():
+    application = Application.builder().token(BOT_TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button_handler))
+    application.run_polling()
+
+if __name__ == "__main__":
+    main()
